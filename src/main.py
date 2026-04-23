@@ -15,28 +15,82 @@ from src.recommender import load_songs, recommend_songs
 def main() -> None:
     songs = load_songs("data/songs.csv")
 
-    user_prefs = {
-        "favorite_genre":  "lofi",
-        "favorite_mood":   "chill",
-        "target_energy":   0.4,
-        "likes_acoustic":  True,
+    high_energy_pop = {
+        "favorite_genre":   "pop",
+        "favorite_mood":    "happy",
+        "target_energy":    0.90,
+        "likes_acoustic":   False,
+        "target_tempo_bpm": 128,
+    }
+
+    chill_lofi = {
+        "favorite_genre":   "lofi",
+        "favorite_mood":    "chill",
+        "target_energy":    0.40,
+        "likes_acoustic":   True,
         "target_tempo_bpm": 80,
     }
 
-    recommendations = recommend_songs(user_prefs, songs, k=5)
+    deep_intense_rock = {
+        "favorite_genre":   "rock",
+        "favorite_mood":    "intense",
+        "target_energy":    0.92,
+        "likes_acoustic":   False,
+        "target_tempo_bpm": 150,
+    }
 
-    print("\n" + "=" * 48)
-    print("  Top 5 Recommendations For You")
-    print("=" * 48)
+    contradiction = {
+        "favorite_genre":   "blues",
+        "favorite_mood":    "sad",
+        "target_energy":    0.95,
+        "likes_acoustic":   False,
+        "target_tempo_bpm": 160,
+    }
 
-    for rank, (song, score, explanation) in enumerate(recommendations, start=1):
-        print(f"\n#{rank}  {song['title']}  -  {song['artist']}")
-        print(f"    Genre: {song['genre']}  |  Mood: {song['mood']}  |  Score: {score:.4f}")
-        print(f"    Why this song:")
-        for line in explanation.split("\n"):
-            print(f"      - {line.strip()}")
+    ghost = {
+        "favorite_genre":   "bossa nova",
+        "favorite_mood":    "nostalgic",
+        "target_energy":    0.50,
+        "likes_acoustic":   True,
+        "target_tempo_bpm": 95,
+    }
 
-    print("\n" + "=" * 48 + "\n")
+    extremist = {
+        "favorite_genre":   "metal",
+        "favorite_mood":    "angry",
+        "target_energy":    1.0,
+        "likes_acoustic":   False,
+        "target_tempo_bpm": 200,
+    }
+
+    middleman = {
+        "favorite_genre":   "indie pop",
+        "favorite_mood":    "happy",
+        "target_energy":    0.50,
+        "likes_acoustic":   True,
+        "target_tempo_bpm": 100,
+    }
+
+    for label, user_prefs in [
+        ("Contradiction",    contradiction),
+        ("Ghost",            ghost),
+        ("Extremist",        extremist),
+        ("Middleman",        middleman),
+    ]:
+        recommendations = recommend_songs(user_prefs, songs, k=5)
+
+        print("\n" + "=" * 52)
+        print(f"  Profile: {label}")
+        print("=" * 52)
+
+        for rank, (song, score, explanation) in enumerate(recommendations, start=1):
+            print(f"\n#{rank}  {song['title']}  -  {song['artist']}")
+            print(f"    Genre: {song['genre']}  |  Mood: {song['mood']}  |  Score: {score:.4f}")
+            print(f"    Why this song:")
+            for line in explanation.split("\n"):
+                print(f"      - {line.strip()}")
+
+        print("\n" + "=" * 52 + "\n")
 
 
 if __name__ == "__main__":

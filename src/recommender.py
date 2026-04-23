@@ -74,20 +74,19 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     score = 0.0
     reasons = []
 
-    # Genre match — worth the most (0.35) because genre reflects
-    # fundamental differences in sound, instrumentation, and production style
+    # Genre match — halved to 0.175 (experiment: reduce categorical dominance)
     if song["genre"] == user_prefs["favorite_genre"]:
-        score += 0.35
-        reasons.append(f"genre match (+0.35)")
+        score += 0.175
+        reasons.append(f"genre match (+0.175)")
 
     # Mood match — second most important (0.20), meaningful but more fluid
     if song["mood"] == user_prefs["favorite_mood"]:
         score += 0.20
         reasons.append(f"mood match (+0.20)")
 
-    # Energy proximity — rewards closeness to target, not just high/low values
+    # Energy proximity — doubled to 0.40 (experiment: audio features matter more)
     energy_score = round(1 - abs(song["energy"] - user_prefs["target_energy"]), 3)
-    weighted_energy = round(energy_score * 0.20, 3)
+    weighted_energy = round(energy_score * 0.40, 3)
     score += weighted_energy
     reasons.append(f"energy proximity {song['energy']} vs target {user_prefs['target_energy']} (+{weighted_energy})")
 
@@ -102,9 +101,9 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     tempo_normalized = song["tempo_bpm"] / 200
     target_tempo_normalized = user_prefs.get("target_tempo_bpm", 100) / 200
     tempo_score = round(1 - abs(tempo_normalized - target_tempo_normalized), 3)
-    weighted_tempo = round(tempo_score * 0.10, 3)
+    weighted_tempo = round(tempo_score * 0.075, 3)
     score += weighted_tempo
-    reasons.append(f"tempo proximity {song['tempo_bpm']} BPM vs target {user_prefs.get('target_tempo_bpm', 100)} BPM (+{weighted_tempo})")
+    reasons.append(f"tempo proximity {song['tempo_bpm']} BPM vs target {user_prefs.get('target_tempo_bpm', 100)} BPM (+{weighted_tempo}) [weight: 0.075]")
 
     return round(score, 4), reasons
 
