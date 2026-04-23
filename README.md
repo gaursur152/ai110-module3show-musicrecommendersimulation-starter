@@ -18,8 +18,44 @@ Replace this paragraph with your own summary of what your version does.
 ## How The System Works
 
 Explain your design in plain language.
+Real world recommendation systems like use a hybrid approach collaborative filtering finds patterns across millions of users' listening behavior, while content-based filtering analyzes the actual audio attributes of each track (energy, tempo, valence, etc.). My version will give a numerical score based on how close it is to the users preference. There will be a heavy weight on genre because that is a more consistent determinet in song intrests.
+Song object contains id, title, artist, genre, mood, energy, tempo, valence, danceability, acousticness
+UserProfile object contains favorite genre, favrite mood, target energy, likes_acoustic
 
+  Song.genre        ←→  UserProfile.favorite_genre   (match: +0.35)
+  Song.mood         ←→  UserProfile.favorite_mood     (match: +0.20)             
+  Song.energy       ←→  UserProfile.target_energy     (proximity: +0.20)         
+  Song.acousticness ←→  UserProfile.likes_acoustic    (proximity: +0.15)         
+  Song.tempo_bpm    ←→  (normalized, proximity)       (+0.10) 
 Some prompts to answer:
+
+flowchart TD
+      A([User Profile\nfavorite_genre, favorite_mood\ntarget_energy,
+  likes_acoustic]) --> B
+
+      B[Load songs.csv\nload_songs] --> C[All 18 Songs as Dicts]
+
+      C --> D{For each Song\nin catalog}
+
+      D --> E[score_song\nuser_prefs, song]
+
+      E --> E1[Genre match?\n+0.35]
+      E --> E2[Mood match?\n+0.20]
+      E --> E3[Energy proximity\n+0.20]
+      E --> E4[Acousticness proximity\n+0.15]
+      E --> E5[Tempo proximity\n+0.10]
+
+      E1 & E2 & E3 & E4 & E5 --> F[Weighted Total Score\n0.0 – 1.0]
+
+      F --> G[Collect all\nsong, score, reasons]
+
+      G --> D
+
+      D -->|All songs scored| H[Sort by score\nDescending]
+
+      H --> I[Slice top K\nrecommend_songs]
+
+      I --> J([Output\nTop K Songs\nwith scores + explanations])
 
 - What features does each `Song` use in your system
   - For example: genre, mood, energy, tempo
@@ -69,6 +105,7 @@ You can add more tests in `tests/test_recommender.py`.
 ## Experiments You Tried
 
 Use this section to document the experiments you ran. For example:
+![alt text](image.png)
 
 - What happened when you changed the weight on genre from 2.0 to 0.5
 - What happened when you added tempo or valence to the score
